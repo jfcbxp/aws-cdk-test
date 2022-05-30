@@ -44,7 +44,11 @@
             <artifactId>aws-cdk-lib</artifactId>
             <version>${cdk.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>software.amazon.awscdk</groupId>
+            <artifactId>ec2</artifactId>
+            <version>1.19.0</version>
+        </dependency>
         <dependency>
             <groupId>software.constructs</groupId>
             <artifactId>constructs</artifactId>
