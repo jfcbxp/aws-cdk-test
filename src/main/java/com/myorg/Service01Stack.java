@@ -9,6 +9,7 @@ import software.amazon.awscdk.services.ecs.ContainerImage;
 import software.amazon.awscdk.services.ecs.LogDriver;
 import software.amazon.awscdk.services.ecs.patterns.ApplicationLoadBalancedFargateService;
 import software.amazon.awscdk.services.ecs.patterns.ApplicationLoadBalancedTaskImageOptions;
+import software.amazon.awscdk.services.elasticloadbalancingv2.HealthCheck;
 import software.amazon.awscdk.services.logs.LogGroup;
 import software.constructs.Construct;
 // import software.amazon.awscdk.Duration;
@@ -45,5 +46,11 @@ public class Service01Stack extends Stack {
                 .publicLoadBalancer(true)
                 .assignPublicIp(true) //necessario pois o natgatways foi definido como 0 para redução da fatura do aws
                 .build();
+
+        service01.getTargetGroup().configureHealthCheck(new HealthCheck.Builder()
+                        .path("/actuator/health")
+                        .port("8080")
+                        .healthyHttpCodes("200")
+                .build());
     }
 }
