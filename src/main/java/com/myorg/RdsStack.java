@@ -55,16 +55,18 @@ public class RdsStack extends Stack {
                 .allocatedStorage(10) //tamanho disco
                 .securityGroups(Collections.singletonList(iSecurityGroup))
                 .vpcSubnets(SubnetSelection.builder()
-                        .subnets(vpc.getPrivateSubnets())
+                        //.subnets(vpc.getPrivateSubnets())
+// publico pois o projeto esta definido como natgatways = 0 para otimizacao das cobrancas do aws
+                        .subnets(vpc.getPublicSubnets())
                         .build())
                 .build();
 
-        CfnOutput.Builder.create(this,"rds-endpoint")
+        CfnOutput.Builder.create(this, "rds-endpoint")
                 .exportName("rds-endpoint")
                 .value(databaseInstance.getDbInstanceEndpointAddress())
                 .build();
 
-        CfnOutput.Builder.create(this,"rds-password")
+        CfnOutput.Builder.create(this, "rds-password")
                 .exportName("rds-password")
                 .value(databasePassword.getValueAsString())
                 .build();
