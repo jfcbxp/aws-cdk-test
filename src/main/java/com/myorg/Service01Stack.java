@@ -15,6 +15,7 @@ import software.amazon.awscdk.services.ecs.ScalableTaskCount;
 import software.amazon.awscdk.services.ecs.patterns.ApplicationLoadBalancedFargateService;
 import software.amazon.awscdk.services.ecs.patterns.ApplicationLoadBalancedTaskImageOptions;
 import software.amazon.awscdk.services.elasticloadbalancingv2.HealthCheck;
+import software.amazon.awscdk.services.events.targets.SnsTopic;
 import software.amazon.awscdk.services.logs.LogGroup;
 import software.constructs.Construct;
 
@@ -22,11 +23,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Service01Stack extends Stack {
-    public Service01Stack(final Construct scope, final String id, Cluster cluster) {
-        this(scope, id, null, cluster);
+    public Service01Stack(final Construct scope, final String id, Cluster cluster, SnsTopic productEventsTopic) {
+        this(scope, id, null, cluster, productEventsTopic);
     }
 
-    public Service01Stack(final Construct scope, final String id, final StackProps props, Cluster cluster) {
+    public Service01Stack(final Construct scope, final String id, final StackProps props, Cluster cluster, SnsTopic productEventsTopic) {
         super(scope, id, props);
 
 
@@ -77,6 +78,8 @@ public class Service01Stack extends Stack {
                 .scaleInCooldown(Duration.seconds(60))
                 .scaleOutCooldown(Duration.seconds(60))
                 .build());
+
+        productEventsTopic.getTopic().grantPublish(service01.getTaskDefinition().getTaskRole());
 
     }
 }
