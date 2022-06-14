@@ -27,7 +27,7 @@ import java.util.Map;
 
 public class Service02Stack extends Stack {
     public Service02Stack(final Construct scope, final String id, Cluster cluster, SnsTopic productEventsTopic, Table productEventsDdb) {
-        this(scope, id, null, cluster, productEventsTopic,productEventsDdb);
+        this(scope, id, null, cluster, productEventsTopic, productEventsDdb);
     }
 
     public Service02Stack(final Construct scope, final String id, final StackProps props, Cluster cluster, SnsTopic productEventsTopic, Table productEventsDdb) {
