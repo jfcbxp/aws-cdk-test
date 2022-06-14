@@ -17,17 +17,19 @@ import software.amazon.awscdk.services.ecs.patterns.ApplicationLoadBalancedTaskI
 import software.amazon.awscdk.services.elasticloadbalancingv2.HealthCheck;
 import software.amazon.awscdk.services.events.targets.SnsTopic;
 import software.amazon.awscdk.services.logs.LogGroup;
+import software.amazon.awscdk.services.s3.Bucket;
+import software.amazon.awscdk.services.sqs.Queue;
 import software.constructs.Construct;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class Service01Stack extends Stack {
-    public Service01Stack(final Construct scope, final String id, Cluster cluster, SnsTopic productEventsTopic) {
-        this(scope, id, null, cluster, productEventsTopic);
+    public Service01Stack(final Construct scope, final String id, Cluster cluster, SnsTopic productEventsTopic, Bucket bucket, Queue queue) {
+        this(scope, id, null, cluster, productEventsTopic, bucket, queue);
     }
 
-    public Service01Stack(final Construct scope, final String id, final StackProps props, Cluster cluster, SnsTopic productEventsTopic) {
+    public Service01Stack(final Construct scope, final String id, final StackProps props, Cluster cluster, SnsTopic productEventsTopic, Bucket bucket, Queue queue) {
         super(scope, id, props);
 
 
@@ -38,6 +40,8 @@ public class Service01Stack extends Stack {
         envVariables.put("SPRING_DATASOURCE_PASSWORD", Fn.importValue("rds-password"));
         envVariables.put("AWS_REGION", "us-east-1");
         envVariables.put("AWS_SNS_TOPIC_PRODUCT_EVENTS_ARN", productEventsTopic.getTopic().getTopicArn());
+        envVariables.put("AWS_S3_BUCKET_INVOICE_NAME", bucket.getBucketName());
+        envVariables.put("AWS_SQS_QUEUE_INVOICE_EVENTS_NAME", queue.getQueueName());
 
         ApplicationLoadBalancedFargateService service01 = ApplicationLoadBalancedFargateService.Builder.create(this, "ALB01")
                 .serviceName("service-01")
@@ -82,6 +86,8 @@ public class Service01Stack extends Stack {
                 .build());
 
         productEventsTopic.getTopic().grantPublish(service01.getTaskDefinition().getTaskRole());
+        queue.grantConsumeMessages(service01.getTaskDefinition().getTaskRole());
+        bucket.grantReadWrite(service01.getTaskDefinition().getTaskRole());
 
     }
 }
